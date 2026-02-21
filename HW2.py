@@ -118,8 +118,31 @@ class Stack:
     # Use your own stack implementation to solve problem 3
 
     def __init__(self):
-        # TODO: initialize the stack
-        pass
+        self.items = []  # use a list
+
+    # add item to the top of stack
+    def push(self, item):
+        self.items.append(item)
+        
+    # return true if stack is empty, false otherwise
+    def isEmpty(self):
+        return len(self.items) == 0
+
+    # return the top item and remove from stack
+    def pop(self):
+        if self.isEmpty():
+            raise IndexError("pop from empty stack")
+        return self.items.pop()
+
+    # return the top item without removing
+    def top(self):
+        if self.isEmpty():
+            raise IndexError("top from empty stack")
+        return self.items[-1]
+    
+    # return the size of stack
+    def size(self):
+        return len(self.items)
 
     # Problem 3: Write code to evaluate a postfix expression using stack and return the integer value
     # Use stack which you implemented above for this problem
@@ -134,10 +157,44 @@ class Stack:
 
     # DO NOT USE EVAL function for evaluating the expression
 
-    def evaluatePostfix(exp: str) -> int:
-        # TODO: implement this using your Stack class
-        pass
-
+    def evaluatePostfix(self, exp: str) -> int:
+        tokens = exp.strip().split()
+        if not tokens:
+            raise ValueError("Empty postfix expression")
+        for token in tokens:
+            if token in {'+', '-', '*', '/'}:
+                # Check for insufficient operands, need at least 2
+                if self.size() < 2:
+                    raise ValueError("Malformed postfix expression:insufficient operands for operation")
+                right = self.pop()
+                left = self.pop()
+                if token == '+':
+                    result = left + right
+                elif token == '-':
+                    result = left - right
+                elif token == '*':
+                    result = left * right
+                elif token == '/':
+                    if right == 0:
+                        raise ZeroDivisionError("division by zero")
+                    result = int(left / right)
+                self.push(result)
+            else:
+                # check the item is a valid integer
+                # this also checks an invalid operaion (i.e. not +,-,*,/)
+                try:
+                    num = int(token)
+                except ValueError:
+                    raise ValueError(f"Invalid token in postfix expression: {token}")
+                self.push(num)
+        # check for errors after evaluating the expression
+        if self.size() > 1:
+            raise ValueError("Malformed postfix expression: too many operands")
+        # there should be one item (result) left on the top of the stack
+        if self.size() == 0:
+            raise ValueError("Malformed postfix expression: no result on stack")
+        
+        return self.pop()
 
 # Main Function. Do not edit the code below
 if __name__ == "__main__":
