@@ -1,4 +1,11 @@
+# Taner Bulbul
+# MSML 606  Data Structures and Algorithms
+# Homework 2 Solutions
+# external source policy included before each problem as comments
+
 import csv
+
+
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
         self.val = val
@@ -7,7 +14,7 @@ class TreeNode:
 
 
 class HomeWork2:
-
+    
     # Problem 1: Construct an expression tree (Binary Tree) from a postfix expression
     # input -> list of strings (e.g., [3,4,+,2,*])
     # this is parsed from p1_construct_tree.csv (check it out for clarification)
@@ -22,23 +29,39 @@ class HomeWork2:
     #       +   2
     #      / \
     #     3   4
+    
+    # external‑source policy:
+    # Used my own code and logic to build the tree
+    # Used Github CoPilot to help with python code/syntax
+    # used VS Code for debugging the code.
 
     def constructBinaryTree(self, input) -> TreeNode:
         # We can use a stack for constructing a BT from a postfix expression.
         # iterate through the passed imput strings/chracters
         stack = []  # create an empty list for stack
+        if not input:  # empty expression passed
+            raise ValueError("Empty postfix expression")
         for val in input:
-            # if we have an operator, we need two nodes one to the left and right
-            # because *, /, + and - are binary operators
             if val in ['+', '-', '*', '/']:
+                # need at least two operands for an operator
+                if len(stack) < 2:
+                    raise ValueError("Malformed postfix expression: insufficient operands")
                 right = stack.pop()
                 left = stack.pop()
-                node = TreeNode(val, left, right)
+                node = TreeNode(val, left, right) # create the tree node
                 stack.append(node)
-            else:  
-                # if we have just a value (not operator), 
-                # we just insert TreeNode with value to the stack, left and right becomes none
+            else:
+                # check the item is a valid numeric operand/integer
+                # checks an invalid operaion (i.e. not +,-,*,/)
+                try:
+                    int(val)
+                except ValueError:
+                    raise ValueError(f"invalid value in expression: {val}")
                 stack.append(TreeNode(val))
+                
+        # After processing, there should be exactly one node (the root)
+        if len(stack) != 1:
+            raise ValueError("Malformed postfix expression: too many operands or invalid sequence")
         return stack[0]  # return root node
 
     # Problem 2.1: Use pre-order traversal (root, left, right) to generate prefix notation
@@ -46,9 +69,14 @@ class HomeWork2:
     # expected output for the tree from problem 1 is [*,+,3,4,2]
     # you can see the examples in p2_traversals.csv
 
+    # external‑source policy:
+    # Used class notes recursive algorithm for pre-order traversal
+    # Used Github CoPilot to help with python syntax
+    # used VS Code for debugging the code.
+    
     def prefixNotationPrint(self, head: TreeNode) -> list:
         prefixList = []
-        if head is None: # if root is empty, return empty list
+        if head is None: #  if root is empty, return empty list
             return []
         # add the root of subtree
         prefixList.append(head.val)
@@ -57,7 +85,7 @@ class HomeWork2:
         # add the right sub tree
         prefixList.extend(self.prefixNotationPrint(head.right))
         # return the tree in pre order
-        # print(postfixList)
+        # print(prefixList)
         return prefixList
 
     # Problem 2.2: Use in-order traversal (left, root, right) for infix notation with appropriate parentheses.
@@ -69,9 +97,14 @@ class HomeWork2:
     # even the outermost expression should be wrapped
     # treat parentheses as individual elements in the returned list (see output)
 
+    # external‑source policy:
+    # Used class notes recursive algorithm for in-order traversal
+    # Used Github CoPilot to help with python syntax
+    # used VS Code for debugging the code.
+    
     def infixNotationPrint(self, head: TreeNode) -> list:
         infixList = []
-        if head is None: # if root is empty, return empty list
+        if head is None:  # if root is empty, return empty list
             return []
         # add opening parenthesis if not a leaf node
         if head.left is not None:
@@ -93,6 +126,11 @@ class HomeWork2:
     # expected output for the tree from problem 1 is [3,4,+,2,*]
     # you can see the examples in p2_traversals.csv
 
+    # external‑source policy:
+    # Used class notes recursive algorithm for post-order traversal
+    # Used Github CoPilot to help with python syntax
+    # used VS Code for debugging the code.
+    
     def postfixNotationPrint(self, head: TreeNode) -> list:
         postfixList = []
         if head is None: # if root is empty, return empty list
@@ -107,7 +145,14 @@ class HomeWork2:
         # print(postfixList)
         return postfixList
     
-
+    # external‑source policy:
+    # Used class notes for main stack operations
+    # Used Github CoPilot to help with python syntax
+    # Use Github coPilot with error/edge cases for the appropriate
+    # exceptions (IndexError, ValueError, ZeroDivisionError)
+    # used VS Code for debugging the code.
+    
+    
 class Stack:
     # Implement your stack using either an array or a list
     # (i.e., implement the functions based on the Stack ADT we covered in class)
@@ -156,25 +201,32 @@ class Stack:
     # handle division by zero appropriately
 
     # DO NOT USE EVAL function for evaluating the expression
+    
+    # external‑source policy:
+    # Used class notes for the algorithm to evaluate a postfix expression using stack
+    # Used Github CoPilot to help with python syntax
+    # Use Github coPilot with error/edge cases for the appropriate
+    # exceptions (ValueError, ZeroDivisionError)
+    # used VS Code for debugging the code.
 
     def evaluatePostfix(self, exp: str) -> int:
-        tokens = exp.strip().split()
-        if not tokens:
+        elts = exp.strip().split()
+        if not elts:
             raise ValueError("Empty postfix expression")
-        for token in tokens:
-            if token in {'+', '-', '*', '/'}:
+        for elt in elts:
+            if elt in {'+', '-', '*', '/'}:
                 # Check for insufficient operands, need at least 2
                 if self.size() < 2:
                     raise ValueError("Malformed postfix expression:insufficient operands for operation")
                 right = self.pop()
                 left = self.pop()
-                if token == '+':
+                if elt == '+':
                     result = left + right
-                elif token == '-':
+                elif elt == '-':
                     result = left - right
-                elif token == '*':
+                elif elt == '*':
                     result = left * right
-                elif token == '/':
+                elif elt == '/':
                     if right == 0:
                         raise ZeroDivisionError("division by zero")
                     result = int(left / right)
@@ -183,9 +235,9 @@ class Stack:
                 # check the item is a valid integer
                 # this also checks an invalid operaion (i.e. not +,-,*,/)
                 try:
-                    num = int(token)
+                    num = int(elt)
                 except ValueError:
-                    raise ValueError(f"Invalid token in postfix expression: {token}")
+                    raise ValueError(f"Invalid token in postfix expression: {elt}")
                 self.push(num)
         # check for errors after evaluating the expression
         if self.size() > 1:
@@ -195,6 +247,7 @@ class Stack:
             raise ValueError("Malformed postfix expression: no result on stack")
         
         return self.pop()
+
 
 # Main Function. Do not edit the code below
 if __name__ == "__main__":
@@ -210,7 +263,7 @@ if __name__ == "__main__":
 
     for i, (postfix_input,) in enumerate(testcases, 1):
         postfix = postfix_input.split(",")
-
+        
         root = homework2.constructBinaryTree(postfix)
         output = homework2.postfixNotationPrint(root)
 
